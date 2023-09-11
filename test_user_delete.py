@@ -1,10 +1,14 @@
+import allure
+
 from lib.my_requests import MyRequests
 from lib.assertions import Assertions
 from lib.base_case import BaseCase
 
-
+@allure.epic("Кейсы Delete")
 class TestUserDelete(BaseCase):
 
+    @allure.description("Удаление служебного пользователя")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_delete_user_id_2(self):
         # LOGIN USER
         login_data = {
@@ -34,13 +38,16 @@ class TestUserDelete(BaseCase):
             cookies={"auth_sid": auth_sid}
         )
 
+
         Assertions.assert_code_status(response3, 200)
 
-
+    @allure.description("Пользователь удаляет себя сам")
+    @allure.severity(allure.severity_level.NORMAL)
     def test_delete_user(self):
         # REGISTER USER
         register_data = self.prepare_registration_data()
         response = MyRequests.post("/user/", data=register_data)
+
 
         Assertions.assert_code_status(response, 200)
         Assertions.assert_json_has_key(response, "id")
@@ -50,7 +57,7 @@ class TestUserDelete(BaseCase):
         password = register_data['password']
         user_id = self.get_json_value(response, "id")
 
-        # LOGIN USER
+
         login_data = {
             'email': email,
             'password': password
@@ -68,6 +75,7 @@ class TestUserDelete(BaseCase):
             cookies={"auth_sid": auth_sid},
         )
 
+
         Assertions.assert_code_status(response2, 200)
 
         # проверка, что пользователя не существует
@@ -78,8 +86,11 @@ class TestUserDelete(BaseCase):
             cookies={"auth_sid": auth_sid}
         )
 
+
         Assertions.assert_code_status(response3, 404)
 
+    @allure.description("Попытка удаления пользователя другим пользователем")
+    @allure.severity(allure.severity_level.CRITICAL)
     def test_delete_user_by_another_user(self):
         # REGISTER FOR USER1
         register_data1 = self.prepare_registration_data()
